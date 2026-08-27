@@ -105,15 +105,16 @@ def main():
     print(f"Found {len(results)} search results")
     new = []
     for r in results:
-        url, text = r["url"], (r["title"]+" "+r["url"]).lower()
+        url, text = r["url"], (r('title')+" "+r["url"]).lower()
         if not any(k in text for k in KW): continue
         if any(d in url for d in SKIP): continue
         if any(c.get("url","").rstrip("/")==url.rstrip("/") for c in existing+new): continue
         plat = detect_platform(url)
         if plat=="Unknown" and not any(k in text for k in ["fund","donate","relief","campaign"]): continue
-        print(f"  New: {r["title"][:60]}... [{plat}]")
+        # print(f"  New: {r('title')[:60]}... [{plat}]")
+        print(f"  New: {r['title'][:60]}... [{plat}]")
         info = extract_info(url); time.sleep(1)
-        new.append({"id":f"AUTO-{len(existing)+len(new)+1:03d}","title":info.get("title") or r["title"],"platform":plat,"organizer":"Unknown (auto-discovered)","organizer_type":"Unverified","location":"Auto-discovered","registration_id":None,"url":url,"funds_raised_usd":0,"target_usd":0,"created_date":datetime.now(timezone.utc).isoformat(),"story":info.get("description") or r["title"],"wallet_address":None,"auto_discovered":True})
+        new.append({"id":f"AUTO-{len(existing)+len(new)+1:03d}","title":info.get("title") or r('title'),"platform":plat,"organizer":"Unknown (auto-discovered)","organizer_type":"Unverified","location":"Auto-discovered","registration_id":None,"url":url,"funds_raised_usd":0,"target_usd":0,"created_date":datetime.now(timezone.utc).isoformat(),"story":info.get("description") or r('title'),"wallet_address":None,"auto_discovered":True})
     print(f"New campaigns: {len(new)}")
     if not new: print("No new campaigns found."); return
     all_c = existing + new
